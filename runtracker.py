@@ -1,4 +1,4 @@
-__version__ = "0.5"
+__version__ = "0.6"
 
 import os
 import base64
@@ -16,11 +16,11 @@ from os.path import exists as file_exists
 from prettytable import PrettyTable
 from copy import deepcopy
 
-compatible_versions = {"0.5"}
+compatible_versions = {"0.6"}
 
 logging.basicConfig(level=logging.INFO, filename="tracker.log")
 logger = logging.getLogger(__name__)
-file_handler = logging.FileHandler("tracker.log")
+file_handler = logging.FileHandler("tracker.log", mode="w")
 formatter = logging.Formatter("%(asctime)s : %(levelname)s : %(name)s : %(message)s")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -203,7 +203,11 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
                         "level": current_level,
                         "mf": current_mf,
                         "players": current_players,
-                        "time_found" : current_time }
+                        "time_found" : current_time}
+
+        if len(self.found_item_list) > 0:
+            if "total_runs" in self.found_item_list[-1]:
+                self.found_item_list = self.found_item_list[:-1]
 
         self.found_item_list.append(current_item)
 
@@ -231,29 +235,30 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.tableItemList.setRowCount(len(item_list))
             for item in item_list:
-                self.tableItemList.setItem(row, 0, QtWidgets.QTableWidgetItem(str(item["run_number"])))
-                contents = self.tableItemList.item(row, 0)
-                contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.tableItemList.setItem(row, 1, QtWidgets.QTableWidgetItem(item["item_name"]))
-                contents = self.tableItemList.item(row, 1)
-                contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                if item["item_ethereal"]:
-                    self.tableItemList.setItem(row, 2, QtWidgets.QTableWidgetItem("Eth"))
-                    contents = self.tableItemList.item(row, 2)
+                if "total_runs" not in item:
+                    self.tableItemList.setItem(row, 0, QtWidgets.QTableWidgetItem(str(item["run_number"])))
+                    contents = self.tableItemList.item(row, 0)
                     contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.tableItemList.setItem(row, 3, QtWidgets.QTableWidgetItem(item["item_type"]))
-                contents = self.tableItemList.item(row, 3)
-                contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.tableItemList.setItem(row, 4, QtWidgets.QTableWidgetItem(str(item["item_quantity"])))
-                contents = self.tableItemList.item(row, 4)
-                contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.tableItemList.setItem(row, 5, QtWidgets.QTableWidgetItem(item["completions"]))
-                contents = self.tableItemList.item(row, 5)
-                contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.tableItemList.setItem(row, 6, QtWidgets.QTableWidgetItem(difficulty_list[item["difficulty"]]))
-                contents = self.tableItemList.item(row, 6)
-                contents.setTextAlignment(QtCore.Qt.AlignCenter)
-                row += 1
+                    self.tableItemList.setItem(row, 1, QtWidgets.QTableWidgetItem(item["item_name"]))
+                    contents = self.tableItemList.item(row, 1)
+                    contents.setTextAlignment(QtCore.Qt.AlignCenter)
+                    if item["item_ethereal"]:
+                        self.tableItemList.setItem(row, 2, QtWidgets.QTableWidgetItem("Eth"))
+                        contents = self.tableItemList.item(row, 2)
+                        contents.setTextAlignment(QtCore.Qt.AlignCenter)
+                    self.tableItemList.setItem(row, 3, QtWidgets.QTableWidgetItem(item["item_type"]))
+                    contents = self.tableItemList.item(row, 3)
+                    contents.setTextAlignment(QtCore.Qt.AlignCenter)
+                    self.tableItemList.setItem(row, 4, QtWidgets.QTableWidgetItem(str(item["item_quantity"])))
+                    contents = self.tableItemList.item(row, 4)
+                    contents.setTextAlignment(QtCore.Qt.AlignCenter)
+                    self.tableItemList.setItem(row, 5, QtWidgets.QTableWidgetItem(item["completions"]))
+                    contents = self.tableItemList.item(row, 5)
+                    contents.setTextAlignment(QtCore.Qt.AlignCenter)
+                    self.tableItemList.setItem(row, 6, QtWidgets.QTableWidgetItem(difficulty_list[item["difficulty"]]))
+                    contents = self.tableItemList.item(row, 6)
+                    contents.setTextAlignment(QtCore.Qt.AlignCenter)
+                    row += 1
         else:
             self.tableItemList.clearContents()
 
@@ -308,6 +313,13 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
     def completeRun(self):
         # create item list
         item_list = self.getFoundItemList()
+        # add last run to keep track correctly
+        if "total_runs" in item_list[-1]:
+            item_list = item_list[:-1]
+            item_list.append({"total_runs": self.getCurrentRunNumber()})
+        else:
+            item_list.append({"total_runs": self.getCurrentRunNumber()})
+
         # encode to json
         item_list_json = self.encodeJSON(item_list)
         # encode to b64
@@ -340,11 +352,13 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
                                             " completing the session")
         confirmation_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 
-        rsp = confirmation_box.exec_()
+        if confirmation_box.exec_() == QMessageBox.Cancel:
+            return
 
         # create item list
         item_list = self.getFoundItemList()
-        item_list.append({"total_runs" : self.getCurrentRunNumber()})
+        # add last run to keep track correctly
+        item_list.append({"total_runs": self.getCurrentRunNumber()})
         # encode to json
         item_list_json = self.encodeJSON(item_list)
         # save to completed folder in plain text
@@ -482,6 +496,8 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
                     # Set defaults first before applying anything because we don't want to add on to anything
                     self.setDefaults()
                     # Restore settings
+                    total_runs = run_dict[-1]["total_runs"]
+                    run_dict = run_dict[:-1]
                     last_item_number = len(run_dict) - 1
                     self.lineSessionName.setText(run_dict[last_item_number]["session_name"])
                     self.spinboxSessionPlayers.setValue(run_dict[last_item_number]["players"])
@@ -524,6 +540,10 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
                         self.cbCTravincal.setChecked(True)
                     if "c" in completions_string:
                         self.cbCCows.setChecked(True)
+
+                    # handle run counter
+                    self.setCurrentRunNumber(total_runs)
+                    self.labelSessionRunNumberCounter.setText(str(total_runs))
 
                     # add items to list
                     for item in run_dict:
@@ -570,7 +590,9 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
                     # Set defaults first before applying anything because we don't want to add on to anything
                     self.setDefaults()
                     # Restore settings - subtract 2 to avoid pulling from the current_run key
-                    last_item_number = len(session_dict) - 2
+                    total_runs = session_dict[-1]["total_runs"]
+                    session_dict = session_dict[:-1]
+                    last_item_number = len(session_dict) - 1
                     self.lineSessionName.setText(session_dict[last_item_number]["session_name"])
                     self.spinboxSessionPlayers.setValue(session_dict[last_item_number]["players"])
                     self.comboSessionDifficulty.setCurrentIndex(session_dict[last_item_number]["difficulty"])
@@ -613,26 +635,26 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
                     if "c" in completions_string:
                         self.cbCCows.setChecked(True)
 
+                    # handle run counter
+                    self.setCurrentRunNumber(total_runs)
+                    self.labelSessionRunNumberCounter.setText(str(total_runs))
+
                     # add items to list
                     for item in session_dict:
-                        if "total_runs" in item:
-                            self.setCurrentRunNumber(item["total_runs"])
-                            self.labelSessionRunNumberCounter.setText(str(self.getCurrentRunNumber()))
-                        else:
-                            self.addItemToFoundList(item["tracker_version"],
-                                                    item["session_name"],
-                                                    item["run_number"],
-                                                    item["item_name"],
-                                                    item["item_type"],
-                                                    item["item_quantity"],
-                                                    item["item_ethereal"],
-                                                    item["completions"],
-                                                    item["difficulty"],
-                                                    item["class"],
-                                                    item["level"],
-                                                    item["mf"],
-                                                    item["players"],
-                                                    item["time_found"])
+                        self.addItemToFoundList(item["tracker_version"],
+                                                item["session_name"],
+                                                item["run_number"],
+                                                item["item_name"],
+                                                item["item_type"],
+                                                item["item_quantity"],
+                                                item["item_ethereal"],
+                                                item["completions"],
+                                                item["difficulty"],
+                                                item["class"],
+                                                item["level"],
+                                                item["mf"],
+                                                item["players"],
+                                                item["time_found"])
 
                 # update the table
                 self.updateItemsFoundTable()
@@ -642,21 +664,6 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         difficulty_list = ["Normal", "Nightmare", "Hell"]
         class_list = ["Amazon", "Assassin", "Barbarian", "Druid", "Necromancer", "Paladin", "Sorceress"]
         report_item_list = deepcopy(self.getFoundItemList())
-        for item in report_item_list:
-            item.pop("tracker_version")
-            item["difficulty"] = difficulty_list[item["difficulty"]]
-            item["class"] = class_list[item["class"]]
-            if item["item_ethereal"]:
-                item["item_ethereal"] = "Eth"
-            else:
-                item["item_ethereal"] = ""
-
-
-        table = PrettyTable(["Session Name", "Run #", "Item Name", "Type", "Quant", "Eth", "Completions",
-                             "Difficulty", "Class", "Level", "MF", "Players", "Time Found"])
-        for item in report_item_list:
-            item_as_list = list(dict(item).values())
-            table.add_row(item_as_list)
 
         total_items = len(report_item_list)
         if total_items <= 0:
@@ -667,8 +674,26 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
             error_box.setText("Found item list is empty - report cannot be generated")
             error_box.setStandardButtons(QMessageBox.Ok)
             rsp = error_box.exec_()
-
+            return
         else:
+            if "total_runs" in report_item_list[-1]:
+                report_item_list = report_item_list[:-1]
+            for item in report_item_list:
+                item.pop("tracker_version")
+                item["difficulty"] = difficulty_list[item["difficulty"]]
+                item["class"] = class_list[item["class"]]
+                if item["item_ethereal"]:
+                    item["item_ethereal"] = "Eth"
+                else:
+                    item["item_ethereal"] = ""
+
+
+            table = PrettyTable(["Session Name", "Run #", "Item Name", "Type", "Quant", "Eth", "Completions",
+                                 "Difficulty", "Class", "Level", "MF", "Players", "Time Found"])
+            for item in report_item_list:
+                item_as_list = list(dict(item).values())
+                table.add_row(item_as_list)
+
             total_runs = self.getCurrentRunNumber()
 
             reports_path = Path("reports")
