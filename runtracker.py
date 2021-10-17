@@ -480,7 +480,7 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
 
     # opens a web link to the user manual
     def openManual(self):
-        webbrowser.open("http://google.com")
+        webbrowser.open("https://github.com/ItzRobD/d2r-run-tracker#readme")
 
     # used to open a backup .run file in case of a crash/error to prevent loss of user data
     def restoreRuns(self):
