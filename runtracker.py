@@ -1,3 +1,16 @@
+# Copyright (C) 2021 - Rob Durst
+# This file is a part of D2R Run Tracker
+#
+# D2R Run Tracker is free software. You may redistribute and/or modify it under the terms
+# of the GNU General Public License as published by the Free Software Foundation, either
+# as version 3 of the License, or (at your option) any later version. See the
+# GNU General Public License for more details.
+#
+# D2R Run Tracker is being distributed in the hope that it will be useful and helpful
+# for Diablo 2 Resurrected players but WITHOUT ANY WARRANTY. This software is NOT
+# supported by Blizzard Entertainment in any way. This software does NOT interact
+# with any other software of game engines and requires manual input
+
 __version__ = "0.6"
 
 import os
@@ -728,7 +741,7 @@ def begin_log_file():
 
 if __name__ == "__main__":
     import sys
-    #sys.excepthook = my_handler
+    sys.excepthook = my_handler
     begin_log_file()
     app = QtWidgets.QApplication(sys.argv)
     window = d2runtracker()
