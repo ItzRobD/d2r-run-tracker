@@ -691,6 +691,7 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             if "total_runs" in report_item_list[-1]:
                 report_item_list = report_item_list[:-1]
+                total_items = total_items - 1
             for item in report_item_list:
                 item.pop("tracker_version")
                 item["difficulty"] = difficulty_list[item["difficulty"]]
