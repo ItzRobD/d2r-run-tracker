@@ -11,7 +11,7 @@
 # supported by Blizzard Entertainment in any way. This software does NOT interact
 # with any other software of game engines and requires manual input
 
-__version__ = "0.7"
+__version__ = "0.7a"
 
 import os
 import base64
@@ -31,7 +31,7 @@ from prettytable import PrettyTable
 from copy import deepcopy
 import qdarkstyle
 
-compatible_versions = {"0.6", "0.7"}
+compatible_versions = {"0.6", "0.7a"}
 
 logging.basicConfig(level=logging.INFO, filename="tracker.log")
 logger = logging.getLogger(__name__)
@@ -336,29 +336,32 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         # create item list
         item_list = self.getFoundItemList()
         # add last run to keep track correctly
-        if "total_runs" in item_list[-1]:
-            item_list = item_list[:-1]
-            item_list.append({"total_runs": self.getCurrentRunNumber()})
+        if len(item_list) > 1:
+            if "total_runs" in item_list[-1]:
+                item_list = item_list[:-1]
+                item_list.append({"total_runs": self.getCurrentRunNumber()})
+            else:
+                item_list.append({"total_runs": self.getCurrentRunNumber()})
         else:
-            item_list.append({"total_runs": self.getCurrentRunNumber()})
+            print(self.getCurrentRunNumber())
 
-        # encode to json
-        item_list_json = self.encodeJSON(item_list)
-        # encode to b64
-        item_list_json_bytes = item_list_json.encode("ascii")
-        encoded_json = base64.b64encode(item_list_json_bytes)
-        encoded_json = encoded_json.decode("ascii")
-        saved_runs_path = Path("saved/runs/")
-        if not saved_runs_path.exists():
-           Path("saved/runs").mkdir(parents=True, exist_ok=True)
-        o = open("saved/runs/" + self.getSessionName() + ".run", "w")
-        o.write(encoded_json)
-        logger.info(str("Run - {0} - saved as file - {1}").format(self.getCurrentRunNumber(),
-                                                                  str(saved_runs_path) + "/" + self.getSessionName()
-                                                                  + ".run"))
-        o.close()
-        #increment run counter
-        self.incrementRunNumber()
+            # encode to json
+            item_list_json = self.encodeJSON(item_list)
+            # encode to b64
+            item_list_json_bytes = item_list_json.encode("ascii")
+            encoded_json = base64.b64encode(item_list_json_bytes)
+            encoded_json = encoded_json.decode("ascii")
+            saved_runs_path = Path("saved/runs/")
+            if not saved_runs_path.exists():
+               Path("saved/runs").mkdir(parents=True, exist_ok=True)
+            o = open("saved/runs/" + self.getSessionName() + ".run", "w")
+            o.write(encoded_json)
+            logger.info(str("Run - {0} - saved as file - {1}").format(self.getCurrentRunNumber(),
+                                                                      str(saved_runs_path) + "/" + self.getSessionName()
+                                                                      + ".run"))
+            o.close()
+            #increment run counter
+            self.incrementRunNumber()
 
     # when called it will save a json of the current data
     # and delete any .run files which share the current session name
@@ -743,6 +746,9 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def setDarkMode(self):
         app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        custom_font = QtGui.QFont()
+        custom_font.setWeight(18)
+        app.setFont()
         self.actionLight_Mode.setChecked(False)
         self.actionDark_Mode.setChecked(True)
 
