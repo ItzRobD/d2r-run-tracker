@@ -69,6 +69,9 @@ Menu bar description:
 	* File > Restore Backup - Restore a previous set of runs from a .run file
 	* File > Open Session - Opens a previously saved session file from a .json file
 	* File > Exit - Closes the program
+
+	* View > Light mode - Changes the theme to light mode
+	* View > Dark mode - Changes the theme to dark mode
 	
 	* Current Session > Complete Session - Performs the same action as the Complete Session button
 	* Current Session > Generate Report - Performs the same action as the Generate Report button

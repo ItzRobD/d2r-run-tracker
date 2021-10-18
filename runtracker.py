@@ -11,7 +11,7 @@
 # supported by Blizzard Entertainment in any way. This software does NOT interact
 # with any other software of game engines and requires manual input
 
-__version__ = "0.6"
+__version__ = "0.7"
 
 import os
 import base64
@@ -19,6 +19,7 @@ import json
 import webbrowser
 import logging
 from pathlib import Path
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from runtrackerv02 import Ui_MainWindow
 from newsessiondialog import NewSessionDialog
@@ -28,8 +29,9 @@ from PyQt5.QtGui import QIcon
 from os.path import exists as file_exists
 from prettytable import PrettyTable
 from copy import deepcopy
+import qdarkstyle
 
-compatible_versions = {"0.6"}
+compatible_versions = {"0.6", "0.7"}
 
 logging.basicConfig(level=logging.INFO, filename="tracker.log")
 logger = logging.getLogger(__name__)
@@ -39,6 +41,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.propagate = False
 
+
 class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(d2runtracker, self).__init__()
@@ -46,6 +49,7 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         # Prevent window from being resized
         self.setFixedSize(854, 738)
         self.setWindowIcon(QtGui.QIcon("icon.png"))
+        self.actionDark_Mode.setChecked(True)
         # Variables
         # used for displaying the run number in labelSessionRunNumberCounter
         self.current_run_number = 1
@@ -74,6 +78,11 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionOpen_Session.triggered.connect(self.openSession)
         # Exit
         self.actionExit.triggered.connect(self.exitApp)
+        # #### VIEW
+        # Light Mode
+        self.actionLight_Mode.triggered.connect(self.setLightMode)
+        # Dark Mode
+        self.actionDark_Mode.triggered.connect(self.setDarkMode)
         # #### CURRENT SESSION
         # Complete session
         self.actionComplete_Session.triggered.connect(self.completeSession)
@@ -691,7 +700,6 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             if "total_runs" in report_item_list[-1]:
                 report_item_list = report_item_list[:-1]
-                total_items = total_items - 1
             for item in report_item_list:
                 item.pop("tracker_version")
                 item["difficulty"] = difficulty_list[item["difficulty"]]
@@ -728,6 +736,16 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         about_box.setStandardButtons(QMessageBox.Close)
         rsp = about_box.exec_()
 
+    def setLightMode(self):
+        app.setStyleSheet("")
+        self.actionLight_Mode.setChecked(True)
+        self.actionDark_Mode.setChecked(False)
+
+    def setDarkMode(self):
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        self.actionLight_Mode.setChecked(False)
+        self.actionDark_Mode.setChecked(True)
+
     # called to close the program
     def exitApp(self):
         QtWidgets.qApp.quit()
@@ -745,6 +763,7 @@ if __name__ == "__main__":
     sys.excepthook = my_handler
     begin_log_file()
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     window = d2runtracker()
     window.show()
     sys.exit(app.exec_())
