@@ -11,7 +11,7 @@
 # supported by Blizzard Entertainment in any way. This software does NOT interact
 # with any other software of game engines and requires manual input
 
-__version__ = "0.7b"
+__version__ = "0.8"
 
 import os
 import base64
@@ -31,7 +31,7 @@ from prettytable import PrettyTable
 from copy import deepcopy
 import qdarkstyle
 
-compatible_versions = {"0.6", "0.7a", "0.7b"}
+compatible_versions = {"0.6", "0.7a", "0.7b", "0.8"}
 
 logging.basicConfig(level=logging.INFO, filename="tracker.log")
 logger = logging.getLogger(__name__)
@@ -734,7 +734,7 @@ class d2runtracker(QtWidgets.QMainWindow, Ui_MainWindow):
         about_box = QMessageBox()
         about_box.setIcon(QMessageBox.NoIcon)
         about_box.setWindowTitle("Diablo 2 Run Tracker")
-        about_box.setText(str("Diablo 2 Run Tracker\n\nAuthor: Rob Durst\n\nVersion: {0}").format(__version__))
+        about_box.setText(str("Diablo 2 Run Tracker\n\nVersion: {0}\n\nAuthor: Rob Durst\nCopyright (C) 2021\nLicensed under GPLv3").format(__version__))
         about_box.setStandardButtons(QMessageBox.Close)
         rsp = about_box.exec_()
 
