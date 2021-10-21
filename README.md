@@ -5,10 +5,11 @@
 
 1. Description
 2. Using the tracker  
-2.1 Terms used  
-2.2 New Session  
-2.3 Main Window  
-2.4 File Structure  
+2.1 Screenshot  
+2.2 Terms used  
+2.3 New Session  
+2.4 Main Window  
+2.5 File Structure  
 3. Contributions / Community / Support
 4. Credits
 
@@ -24,16 +25,19 @@ as time allows.
 
 #### 2. Using the tracker
 
-##### 2.1 Terms used
+##### 2.1 Screenshot
+![Main window screenshot](https://i.imgur.com/gOJZMBQ.png | width=500)
+
+##### 2.2 Terms used
 
 Run: A run consists of a single game creation. Every time you create a new game this is considered a new run.
 Session: A session is a collection of runs. This can be up to your descrition but an example would be every new day or you can 		 	 create a new session after leveling, etc.
 
-##### 2.2 New session
+##### 2.3 New session
 
 Upon launch you'll be prompted to choose a session name. The session name cannot be changed once it's set. It is associated with the save files and report file. The default session name is the current date. If the selected session name is already in use the following number will be appended to the end of the name.
  
-##### 2.3 Main Window
+##### 2.4 Main Window
 
 Interface description:
 
@@ -79,7 +83,7 @@ Menu bar description:
 	* Help > Manual > Opens a web browser to the manual page
 	* Help > About > Displays program and version information
 	
-##### 2.4 File Structure
+##### 2.5 File Structure
 
 * Base Directory
 	* tracker.log - Contains log data and crash information. Please submit this with any bug or crash reports. File is
