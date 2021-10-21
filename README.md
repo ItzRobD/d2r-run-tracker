@@ -26,7 +26,7 @@ as time allows.
 #### 2. Using the tracker
 
 ##### 2.1 Screenshot
-![Main window screenshot](https://i.imgur.com/gOJZMBQ.png | width=500)
+<img src = "https://i.imgur.com/gOJZMBQ.png" width=500>
 
 ##### 2.2 Terms used
 
