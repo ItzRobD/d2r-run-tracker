@@ -23,6 +23,8 @@ This program was developed in my spare time and as such I can not devote a profe
 bug reports and suggestions will be appreciated. Suggestions will be taken into consideration. Bug reports will be addressed
 as time allows.
 
+Note: This project is not currently maintained or supported. A future iteration may exist. Community support/suggestions will be handled through Github Issues.
+
 #### 2. Using the tracker
 
 ##### 2.1 Screenshot
@@ -108,13 +110,8 @@ https://github.com/ItzRobD/d2r-run-tracker
 Any use of the source code must adhere to the GPL 3 License.
 The program was developed entirely using Python
 
-* Discord:
-	* https://discord.gg/9DSuxWC5KT
-* Support emails:
-	* Author: itzrobd@slashquitgaming.com
-	* Bug reporting: d2r-tracker-bugs@slashquitgaming.com
-	* Suggestions: d2r-tracker-suggestions@slashquitgaming.com
-	
+Any support requests/suggestions will be addressed via Github Issues
+
 **_When submitting a crash or bug report please include the tracker.log file contained within the base directory_**
 
 
